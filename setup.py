@@ -4,7 +4,7 @@ from __future__ import print_function
 
 from setuptools import setup
 
-setup(name="pyprophet-brutus-drive-eth",
+setup(name="pyprophet-brutus-driver",
       version="0.0.1",
       author="Uwe Schmitt",
       author_email="uwe.schmitt@id.ethz.ch",
