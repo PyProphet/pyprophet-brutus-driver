@@ -1,3 +1,4 @@
 .*.sw?
 *.pyc
 pyprophet_brutus_drive_eth.egg-info
+dist
