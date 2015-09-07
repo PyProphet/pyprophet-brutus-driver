@@ -3,10 +3,14 @@ from __future__ import print_function
 
 import os
 
-from pyprophet_cli.core import (data_folder, data_filename_pattern,
-                                 job_count, sample_factor)
 
-from click import option
+import pkg_resources  # part of setuptools
+version = tuple(map(int, pkg_resources.require("pyprophet-brutus-driver")[0].version.split(".")))
+
+
+from pyprophet_cli.core import (data_folder, data_filename_pattern, job_count, sample_factor)
+
+from click import option, echo
 
 
 def _user_email():
@@ -33,6 +37,14 @@ def _run_workflow(self):
                                          self.extra_args_apply_weights, self.extra_args_score,
                                          callback=callback, logger=self.logger)
 
+
+def print_version(ctx, param, value):
+    if not value or ctx.resilient_parsing:
+        return
+    echo("%d.%d.%d" % version)
+    ctx.exit()
+
+
 def _options():
 
     options = [data_folder, data_filename_pattern, job_count, sample_factor,
@@ -49,6 +61,8 @@ def _options():
                option("--notification-email-address", default=_user_email(),
                       help=("send result notification to this address, use 'null' to disable this "
                             "[default={}]".format(_user_email()))),
+               option("--version", is_flag=True, callback=print_version, expose_value=False,
+                      is_eager=True, help="print version of brutus plugin")
                ]
     return options
 
