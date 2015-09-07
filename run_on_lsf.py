@@ -18,11 +18,12 @@ def run_workflow(data_folder, data_filename_pattern, job_count, sample_factor,
     if not os.path.exists(tmp_root):
         os.makedirs(tmp_root)
 
-    now = str(time.ctime(time.time())).split(" ")
-    weekday = now[0]
-    time_ = now[3].replace(":", "_")
+    #now = str(time.ctime(time.time())).split(" ")
+    #weekday = now[0]
+    #time_ = now[3].replace(":", "_")
 
-    prefix = "%s_%s_" % (weekday, time_)
+    #prefix = "%s_%s_" % (weekday, time_)
+    prefix = time.strftime("%a_%H_%M_%d_%m_%Y_")
 
     root_folder = tempfile.mkdtemp(dir=tmp_root, prefix=prefix)
     if logger is not None:
