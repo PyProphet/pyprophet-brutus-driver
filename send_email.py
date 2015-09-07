@@ -22,7 +22,17 @@ def send_result(from_, to, output, result_folder, logger):
         pathes.append(path)
 
     pathes.sort()
+
     txt = "pyprophet created the following result files: \n\n    %s" % "\n    ".join(pathes)
+    txt += "\n\n"
+
+    path = os.path.join(result_folder, "resource_summary")
+    if os.path.exists(path):
+        with open(path, "r") as fp:
+            txt += fp.read()
+    else:
+        txt += "no resource_summary file created !"
+
     msg.attach(MIMEText(txt))
 
     # create attachment

@@ -72,9 +72,12 @@ bsub -oo $MSG_FOLDER/final_out -J "success"\
 # block until done
 bsub -K -w "done(success) || done(error)" -g $GROUP "echo finalized"
 
+# kill all pending jobs
 bkill -g $GROUP 0
 
-for FILE in check_out subsample_out learn_out apply_weights_out scorer_out final_out; do
+
+for STEP in check subsample learn apply_weights scorer final; do
+    FILE=$STEP\_out
     FULLPATH=$MSG_FOLDER/$FILE
     echo
     if test -f $FULLPATH; then
@@ -89,4 +92,36 @@ for FILE in check_out subsample_out learn_out apply_weights_out scorer_out final
     echo "----------------------------------------------------------------------------------"
 done;
 
+
+R_SUMMARY=$WORK_FOLDER/results/resource_summary
+
+echo resource summary for job group $GROUP > $R_SUMMARY
+echo >> $R_SUMMARY
+
+for STEP in check subsample learn apply_weights scorer final; do
+    FILE=$STEP\_out
+    FULLPATH=$MSG_FOLDER/$FILE
+    if test -f $FULLPATH; then
+        S=$(grep -e ^Started\ at  $FULLPATH | cut -d" " -f7-)
+        E=$(grep -e ^Results\ reported\ at  $FULLPATH | cut -d" " -f8-)
+        MEM=$(grep "Max Swap" $FULLPATH | cut -d: -f2 | sed  's/\ *//')
+        printf "   %15s started at   %s\n" $STEP "$S" >> $R_SUMMARY
+        printf "   %15s ended   at   %s\n" $STEP "$E" >> $R_SUMMARY
+        printf "   %15s needed swap  %s\n" $STEP "$MEM" >> $R_SUMMARY
+        echo >> $R_SUMMARY
+    fi
+done
+
+for STEP in check subsample learn apply_weights scorer final; do
+    FILE=$STEP\_out
+    FULLPATH=$MSG_FOLDER/$FILE
+    if test -f $FULLPATH; then
+        echo >> $R_SUMMARY
+        echo $STEP >> $R_SUMMARY
+        sed '1,/Resource usage summary:/d;/The output (if any) follows/,$d' $FULLPATH >> $R_SUMMARY
+        echo >> $R_SUMMARY
+    fi;
+done
+
 echo $WORK_FOLDER/results
+
