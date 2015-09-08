@@ -12,16 +12,26 @@ def test_0():
 
     data_folder = "/cluster/scratch_xp/public/schmittu"
 
-    file_path = "{HERE}/test_data.txt".format(HERE=HERE)
-    shutil.copy(file_path, data_folder + "/test_data_0.tsv")
-    shutil.copy(file_path, data_folder + "/test_data_1.tsv")
-    shutil.copy(file_path, data_folder + "/test_data_2.tsv")
-    shutil.copy(file_path, data_folder + "/test_data_3.tsv")
-    shutil.copy(file_path, data_folder + "/test_data_4.tsv")
+    file_path = "{HERE}/test_data_1gb.txt".format(HERE=HERE)
+    # shutil.copy(file_path, data_folder + "/test_data_0.tsv")
+    #os.symlink(data_folder + "/test_data_0.tsv", data_folder + "/test_data_1.tsv")
+    #os.symlink(data_folder + "/test_data_0.tsv", data_folder + "/test_data_2.tsv")
+    #os.symlink(data_folder + "/test_data_0.tsv", data_folder + "/test_data_3.tsv")
+    #os.symlink(data_folder + "/test_data_0.tsv", data_folder + "/test_data_4.tsv")
+    #os.symlink(data_folder + "/test_data_0.tsv", data_folder + "/test_data_5.tsv")
+    #os.symlink(data_folder + "/test_data_0.tsv", data_folder + "/test_data_6.tsv")
+    #os.symlink(data_folder + "/test_data_0.tsv", data_folder + "/test_data_7.tsv")
+    #os.symlink(data_folder + "/test_data_0.tsv", data_folder + "/test_data_8.tsv")
+    #os.symlink(data_folder + "/test_data_0.tsv", data_folder + "/test_data_9.tsv")
+    # os.symlink(data_folder + "/test_data_0.tsv", data_folder + "/test_data_10.tsv")
+    # os.symlink(data_folder + "/test_data_0.tsv", data_folder + "/test_data_11.tsv")
+    #shutil.copy(file_path, data_folder + "/test_data_2.tsv")
+    #shutil.copy(file_path, data_folder + "/test_data_3.tsv")
+    #shutil.copy(file_path, data_folder + "/test_data_4.tsv")
 
-    cmd = """pyprophet-cli run_on_brutus --data-folder {data_folder} \
+    cmd = """bsub pyprophet-cli run_on_brutus --data-folder {data_folder} \
                                          --data-filename-pattern '*.tsv' \
-                                         --job-count 3 \
+                                         --job-count 12 \
                                          --sample-factor 0.2 \
           """.format(**locals())
 

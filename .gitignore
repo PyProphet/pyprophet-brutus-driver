@@ -1,4 +1,4 @@
 .*.sw?
 *.pyc
-pyprophet_brutus_drive_eth.egg-info
+pyprophet_brutus_driver.egg-info
 dist
