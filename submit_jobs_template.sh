@@ -95,22 +95,23 @@ done;
 
 R_SUMMARY=$WORK_FOLDER/results/resource_summary
 
-echo resource summary for job group $GROUP > $R_SUMMARY
+echo TIMELINE >> $R_SUMMARY
 echo >> $R_SUMMARY
+(
+    FMT="    %s %15s %s %s\n"
+    for STEP in check subsample learn apply_weights scorer final; do
+        FILE=$STEP\_out
+        FULLPATH=$MSG_FOLDER/$FILE
+        if test -f $FULLPATH; then
+            grep -e ^Started\ at  $FULLPATH | cut -d" " -f7- | xargs -L1 -i printf "$FMT" {{}} $STEP start
+            grep -e ^Results\ reported\ at  $FULLPATH | cut -d" " -f8- | xargs -L1 -i printf "$FMT" {{}} $STEP end
+        fi
+    done
+) | sort >> $R_SUMMARY
 
-for STEP in check subsample learn apply_weights scorer final; do
-    FILE=$STEP\_out
-    FULLPATH=$MSG_FOLDER/$FILE
-    if test -f $FULLPATH; then
-        S=$(grep -e ^Started\ at  $FULLPATH | cut -d" " -f7-)
-        E=$(grep -e ^Results\ reported\ at  $FULLPATH | cut -d" " -f8-)
-        MEM=$(grep "Max Swap" $FULLPATH | cut -d: -f2 | sed  's/\ *//')
-        printf "   %15s started at   %s\n" $STEP "$S" >> $R_SUMMARY
-        printf "   %15s ended   at   %s\n" $STEP "$E" >> $R_SUMMARY
-        printf "   %15s needed swap  %s\n" $STEP "$MEM" >> $R_SUMMARY
-        echo >> $R_SUMMARY
-    fi
-done
+echo >> $R_SUMMARY
+echo resource summary for job group $GROUP >> $R_SUMMARY
+echo >> $R_SUMMARY
 
 for STEP in check subsample learn apply_weights scorer final; do
     FILE=$STEP\_out
