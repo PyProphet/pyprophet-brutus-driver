@@ -8,9 +8,20 @@ import pkg_resources  # part of setuptools
 version = tuple(map(int, pkg_resources.require("pyprophet-brutus-driver")[0].version.split(".")))
 
 
-from pyprophet_cli.core import (data_folder, data_filename_pattern, job_count, sample_factor)
+from pyprophet_cli.core import (data_folder, data_filename_pattern, job_count, sample_factor,)
 
-from click import option, echo
+from click import option, echo, Path
+
+work_folder = option("--work-folder",
+                        help="folder for intermediate results which are needed by following processing steps",
+                        type=Path(file_okay=False, dir_okay=True, readable=True, writable=True),
+                        required=False, default=None)
+
+result_folder = option("--result-folder",
+                        help="folder for final results",
+                        type=Path(file_okay=False, dir_okay=True, writable=True),
+                        required=False, default=None)
+
 
 
 def _user_email():
@@ -31,11 +42,13 @@ def _run_workflow(self):
     else:
         callback = None
 
-    output, result_folder = run_workflow(self.data_folder, self.data_filename_pattern,
-                                         self.job_count, self.sample_factor,
-                                         self.extra_args_subsample, self.extra_args_learn,
-                                         self.extra_args_apply_weights, self.extra_args_score,
-                                         callback=callback, logger=self.logger)
+    (output,
+     result_folder,
+     work_folder) = run_workflow(self.work_folder, self.result_folder, self.data_folder, self.data_filename_pattern,
+                                 self.job_count, self.sample_factor,
+                                 self.extra_args_subsample, self.extra_args_learn,
+                                 self.extra_args_apply_weights, self.extra_args_score,
+                                 callback=callback, logger=self.logger)
 
 
 def print_version(ctx, param, value):
@@ -48,6 +61,7 @@ def print_version(ctx, param, value):
 def _options():
 
     options = [data_folder, data_filename_pattern, job_count, sample_factor,
+               result_folder, work_folder,
                option("--extra-args-check", default="",
                       help="extra args for calling check command"),
                option("--extra-args-subsample", default="",

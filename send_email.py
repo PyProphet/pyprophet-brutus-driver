@@ -26,7 +26,7 @@ def send_result(from_, to, output, result_folder, logger):
     txt = "pyprophet created the following result files: \n\n    %s" % "\n    ".join(pathes)
     txt += "\n\n"
 
-    path = os.path.join(result_folder, "resource_summary")
+    path = os.path.join(result_folder, "resource_summary.txt")
     if os.path.exists(path):
         with open(path, "r") as fp:
             txt += fp.read()
