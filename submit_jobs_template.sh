@@ -97,7 +97,11 @@ done;
 
 R_SUMMARY=$RESULT_FOLDER/resource_summary.txt
 
+D=[0-9][0-9]
+TIME=$D:$D:$D
+
 echo TIMELINE >> $R_SUMMARY
+
 echo >> $R_SUMMARY
 (
     FMT="    %s %15s %s %s\n"
@@ -105,8 +109,8 @@ echo >> $R_SUMMARY
         FILE=$STEP\_out
         FULLPATH=$MSG_FOLDER/$FILE
         if test -f $FULLPATH; then
-            grep -e ^Started\ at  $FULLPATH | cut -d" " -f7- | xargs -L1 -i printf "$FMT" {{}} $STEP start
-            grep -e ^Results\ reported\ at  $FULLPATH | cut -d" " -f8- | xargs -L1 -i printf "$FMT" {{}} $STEP end
+            grep -e ^Started\ at  $FULLPATH | grep -o $TIME | xargs -L1 -i printf "$FMT" {{}} $STEP start
+            grep -e ^Results\ reported\ at  $FULLPATH | grep -o $TIME | xargs -L1 -i printf "$FMT" {{}} $STEP end
         fi
     done
 ) | sort >> $R_SUMMARY
