@@ -8,9 +8,12 @@ import pkg_resources  # part of setuptools
 version = tuple(map(int, pkg_resources.require("pyprophet-brutus-driver")[0].version.split(".")))
 
 
-from pyprophet_cli.core import (data_folder, data_filename_pattern, job_count, sample_factor,)
+from pyprophet_cli.common_options import (data_folder, data_filename_pattern, job_count,
+                                          sample_factor,)
 
 from click import option, echo, Path
+
+# overwrite some options, work and result folder do not have to exist:
 
 work_folder = option("--work-folder",
                         help="folder for intermediate results which are needed by following processing steps",
