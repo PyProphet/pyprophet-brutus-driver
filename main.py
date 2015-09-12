@@ -3,6 +3,7 @@ from __future__ import print_function
 
 import os
 
+
 import pkg_resources  # part of setuptools
 version = tuple(map(int, pkg_resources.require("pyprophet-brutus-driver")[0].version.split(".")))
 
@@ -15,14 +16,15 @@ from click import option, echo, Path
 # overwrite some options, work and result folder do not have to exist:
 
 work_folder = option("--work-folder",
-                     help="folder for intermediate results",
-                     type=Path(file_okay=False, dir_okay=True, readable=True, writable=True),
-                     required=False, default=None)
+                        help="folder for intermediate results which are needed by following processing steps",
+                        type=Path(file_okay=False, dir_okay=True, readable=True, writable=True),
+                        required=False, default=None)
 
 result_folder = option("--result-folder",
-                       help="folder for final results",
-                       type=Path(file_okay=False, dir_okay=True, writable=True),
-                       required=False, default=None)
+                        help="folder for final results",
+                        type=Path(file_okay=False, dir_okay=True, writable=True),
+                        required=False, default=None)
+
 
 
 def _user_email():
@@ -45,8 +47,8 @@ def _run_workflow(self):
 
     (output,
      result_folder,
-     work_folder) = run_workflow(self.work_folder, self.result_folder, self.data_folder,
-                                 self.data_filename_pattern, self.job_count, self.sample_factor,
+     work_folder) = run_workflow(self.work_folder, self.result_folder, self.data_folder, self.data_filename_pattern,
+                                 self.job_count, self.sample_factor,
                                  self.extra_args_subsample, self.extra_args_learn,
                                  self.extra_args_apply_weights, self.extra_args_score,
                                  callback=callback, logger=self.logger)

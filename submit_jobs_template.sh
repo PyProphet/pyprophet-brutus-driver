@@ -62,17 +62,16 @@ bsub -o $MSG_FOLDER/scorer_out -J "score[1-$JC]" -w "done(apply_weights)" $R -g 
                          {extra_args_score}
 EOL
 
-
-bsub -oo $MSG_FOLDER/final_out -J "error" \
+bsub -oo $MSG_FOLDER/final_out -J "wait_for_error" \
      -w "exit(score)||exit(prepare)||exit(subsample)||exit(learn)||exit(apply_weights)"\
      -g $GROUP "echo workflow failed"
 
-bsub -oo $MSG_FOLDER/final_out -J "success"\
+bsub -oo $MSG_FOLDER/final_out -J "wait_for_success"\
      -w "done(score)"\
      -g $GROUP "echo workflow finished"
 
 # block until done
-bsub -K -w "done(success) || done(error)" -g $GROUP "echo finalized"
+bsub -K -w "done(wait_for_success) || done(wait_for_error)" -g $GROUP "echo finalized"
 
 # kill all pending jobs
 bkill -g $GROUP 0
