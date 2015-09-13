@@ -49,6 +49,7 @@ def _run_workflow(self):
      result_folder,
      work_folder) = run_workflow(self.work_folder, self.result_folder, self.data_folder, self.data_filename_pattern,
                                  self.job_count, self.sample_factor,
+                                 self.extra_args_prepare,
                                  self.extra_args_subsample, self.extra_args_learn,
                                  self.extra_args_apply_weights, self.extra_args_score,
                                  callback=callback, logger=self.logger)
@@ -65,8 +66,8 @@ def _options():
 
     options = [data_folder, data_filename_pattern, job_count, sample_factor,
                result_folder, work_folder,
-               option("--extra-args-check", default="",
-                      help="extra args for calling check command"),
+               option("--extra-args-prepare", default="",
+                      help="extra args for calling prepare command"),
                option("--extra-args-subsample", default="",
                       help="extra args for calling subsample command"),
                option("--extra-args-learn", default="",

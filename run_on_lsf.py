@@ -10,7 +10,7 @@ import time
 
 
 def run_workflow(work_folder, result_folder, data_folder, data_filename_pattern, job_count, sample_factor,
-                 extra_args_subsample="", extra_args_learn="",
+                 extra_args_prepare="", extra_args_subsample="", extra_args_learn="",
                  extra_args_apply_weights="", extra_args_score="", callback=None, logger=None):
 
     if result_folder is None:

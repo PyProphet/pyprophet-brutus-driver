@@ -17,7 +17,8 @@ MSG_FOLDER={work_folder}
 bsub -o $MSG_FOLDER/prepare_out -cwd $GROUP -J "prepare" $R -g $GROUP <<EOL
     pyprophet-cli prepare --data-folder $DATA_FOLDER \
                           --data-filename-pattern "{data_filename_pattern}" \
-                          --work-folder $WORK_FOLDER
+                          --work-folder $WORK_FOLDER \
+                          {extra_args_prepare}
 EOL
 
 bsub -o $MSG_FOLDER/subsample_out -J "subsample[1-$JC]" -w "done(prepare)" $R -g $GROUP <<EOL
