@@ -1,7 +1,6 @@
 #!/bin/bash
 
-
-R="-W 3:00 -R rusage[scratch=100000] -R lustre"
+R="-W 3:00 -R rusage[scratch=100000] -R lustre -R rusage[mem=8192]"
 
 DATA_FOLDER={data_folder}
 WORK_FOLDER={work_folder}
