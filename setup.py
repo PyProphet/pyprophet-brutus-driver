@@ -2,15 +2,15 @@
 from __future__ import print_function
 
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
-setup(name="pyprophet-brutus-driver",
-      version="0.0.10",
+setup(name="pyprophet-brutus",
+      version="0.0.11",
       author="Uwe Schmitt",
       author_email="uwe.schmitt@id.ethz.ch",
       license="BSD",
       install_requires=["pyprophet-cli"],
       entry_points={'pyprophet_cli_plugin': ['config=pyprophet_brutus.main:config']},
       include_package_data=True,
-      package_dir = {'pyprophet_brutus': 'pyprophet_brutus'}
+      packages=find_packages(exclude=['ez_setup', 'examples', 'tests']),
       )

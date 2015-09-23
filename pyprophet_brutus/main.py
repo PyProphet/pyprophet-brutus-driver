@@ -5,7 +5,7 @@ import os
 
 
 import pkg_resources  # part of setuptools
-version = tuple(map(int, pkg_resources.require("pyprophet-brutus-driver")[0].version.split(".")))
+version = tuple(map(int, pkg_resources.require("pyprophet-brutus")[0].version.split(".")))
 
 
 from pyprophet_cli.common_options import (data_folder, data_filename_pattern, job_count,

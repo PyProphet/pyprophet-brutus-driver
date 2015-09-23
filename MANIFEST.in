@@ -1,1 +1,1 @@
-include submit_jobs_template.sh
+include pyprophet_brutus/submit_jobs_template.sh
