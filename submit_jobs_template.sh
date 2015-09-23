@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-R="-W 3:00 -R rusage[men=8048,scratch=100000] -R lustre"
+R="-W 3:00 -R rusage[scratch=100000] -R lustre"
 
 DATA_FOLDER={data_folder}
 WORK_FOLDER={work_folder}
@@ -17,7 +17,8 @@ MSG_FOLDER={work_folder}
 bsub -o $MSG_FOLDER/prepare_out -cwd $GROUP -J "prepare" $R -g $GROUP <<EOL
     pyprophet-cli prepare --data-folder $DATA_FOLDER \
                           --data-filename-pattern "{data_filename_pattern}" \
-                          --work-folder $WORK_FOLDER
+                          --work-folder $WORK_FOLDER \
+                          {extra_args_prepare}
 EOL
 
 bsub -o $MSG_FOLDER/subsample_out -J "subsample[1-$JC]" -w "done(prepare)" $R -g $GROUP <<EOL
@@ -62,17 +63,16 @@ bsub -o $MSG_FOLDER/scorer_out -J "score[1-$JC]" -w "done(apply_weights)" $R -g 
                          {extra_args_score}
 EOL
 
-
-bsub -oo $MSG_FOLDER/final_out -J "error" \
+bsub -oo $MSG_FOLDER/final_out -J "wait_for_error" \
      -w "exit(score)||exit(prepare)||exit(subsample)||exit(learn)||exit(apply_weights)"\
      -g $GROUP "echo workflow failed"
 
-bsub -oo $MSG_FOLDER/final_out -J "success"\
+bsub -oo $MSG_FOLDER/final_out -J "wait_for_success"\
      -w "done(score)"\
      -g $GROUP "echo workflow finished"
 
 # block until done
-bsub -K -w "done(success) || done(error)" -g $GROUP "echo finalized"
+bsub -K -w "done(wait_for_success) || done(wait_for_error)" -g $GROUP "echo finalized"
 
 # kill all pending jobs
 bkill -g $GROUP 0

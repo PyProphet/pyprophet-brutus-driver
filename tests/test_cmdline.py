@@ -13,7 +13,7 @@ def test_0():
     data_folder = "/cluster/scratch_xp/public/schmittu"
 
     file_path = "{HERE}/test_data.txt".format(HERE=HERE)
-    #shutil.copy(file_path, data_folder + "/test_data_0.tsv")
+    shutil.copy(file_path, data_folder + "/test_data_0.tsv")
     #os.symlink(data_folder + "/test_data_0.tsv", data_folder + "/test_data_1.tsv")
     #os.symlink(data_folder + "/test_data_0.tsv", data_folder + "/test_data_2.tsv")
     #os.symlink(data_folder + "/test_data_0.tsv", data_folder + "/test_data_3.tsv")
@@ -29,10 +29,12 @@ def test_0():
     #shutil.copy(file_path, data_folder + "/test_data_3.tsv")
     #shutil.copy(file_path, data_folder + "/test_data_4.tsv")
 
-    cmd = """bsub pyprophet-cli run_on_brutus --data-folder {data_folder} \
-                                         --data-filename-pattern '*.tsv' \
-                                         --job-count 4 \
-                                         --sample-factor 0.2 \
+    cmd = """bsub pyprophet-cli run_on_brutus\
+            --data-folder {data_folder} \
+            --data-filename-pattern 'test_data_0.tsv' \
+            --job-count 1 \
+            --sample-factor 0.2 \
+            --extra-args-prepare "--extra-group-column transition_group_id"\
           """.format(**locals())
 
     subprocess.call(cmd, shell=True)
