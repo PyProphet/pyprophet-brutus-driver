@@ -1,10 +1,11 @@
 # encoding: utf-8
 from __future__ import print_function
 
-import tempfile
 import os
 import shutil
 import subprocess
+import sys
+import tempfile
 import threading
 import time
 
@@ -42,6 +43,9 @@ def run_workflow(work_folder, result_folder, data_folder, data_filename_pattern,
         logger.info("use script template from %s", script_template_path)
 
     script = template.format(**locals())
+
+    if sys.platform == "linux2":
+        script = script.replace("\r\n", "\n")
 
     script_path = os.path.join(work_folder, "run.sh")
     with open(script_path, "w") as fp:
