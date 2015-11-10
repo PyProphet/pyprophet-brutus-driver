@@ -9,9 +9,10 @@ import threading
 import time
 
 
-def run_workflow(work_folder, result_folder, data_folder, data_filename_pattern, job_count, sample_factor,
-                 extra_args_prepare="", extra_args_subsample="", extra_args_learn="",
-                 extra_args_apply_weights="", extra_args_score="", callback=None, logger=None):
+def run_workflow(work_folder, result_folder, data_folder, data_filename_pattern, job_count,
+                 sample_factor, lambda_, extra_group_columns, extra_args_prepare="",
+                 extra_args_subsample="", extra_args_learn="", extra_args_apply_weights="",
+                 extra_args_score="", callback=None, logger=None):
 
     if result_folder is None:
         user = os.environ.get("USER")
@@ -40,6 +41,9 @@ def run_workflow(work_folder, result_folder, data_folder, data_filename_pattern,
     template = open(script_template_path, "r").read()
     if logger is not None:
         logger.info("use script template from %s", script_template_path)
+
+    extra_args_prepare_cols = " ".join(["--extra-group-column %s" % c for c in extra_group_columns])
+    extra_args_prepare += " " + extra_args_prepare_cols
 
     script = template.format(**locals())
 

@@ -57,6 +57,7 @@ bsub -o $MSG_FOLDER/scorer_out -J "score[1-$JC]" -w "done(apply_weights)" $R -g 
                          --job-count \$LSB_JOBINDEX_END \
                          --local-folder \$TMPDIR \
                          --overwrite-results \
+                         --lambda {lambda_} \
                          --result-folder $RESULT_FOLDER \
                          --chunk-size 1000000 \
                          {extra_args_score}
