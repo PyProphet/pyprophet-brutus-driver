@@ -7,6 +7,7 @@ import os
 import zipfile
 
 
+from email import encoders
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
@@ -89,6 +90,6 @@ def send_result(from_, to, output, result_folder, logger):
 if __name__ == "__main__":
     import logging
     from_ = to = "schmittu@ethz.ch"
-    output = "outptu"
+    output = "test output"
     result_folder = "/cluster/scratch_xp/public/schmittu/pyprophet_tmp/Sun_20_11_13_09_2015_tjTqPo/"
     send_result(from_, to, output, result_folder, logger=logging)
