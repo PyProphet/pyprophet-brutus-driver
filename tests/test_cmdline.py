@@ -34,7 +34,10 @@ def test_0():
             --data-filename-pattern 'test_data_0.tsv' \
             --job-count 1 \
             --sample-factor 0.2 \
-            --extra-args-prepare "--extra-group-column transition_group_id"\
+            --extra-group-column transition_group_id\
+            --extra-group-column transition_group_id\
+            --extra-group-column transition_group_id\
+            --lambda 0.8
           """.format(**locals())
 
     subprocess.call(cmd, shell=True)
