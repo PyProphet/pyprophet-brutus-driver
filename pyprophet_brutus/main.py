@@ -9,7 +9,7 @@ version = tuple(map(int, pkg_resources.require("pyprophet-brutus")[0].version.sp
 
 
 from pyprophet_cli.common_options import (data_folder, data_filename_pattern, job_count,
-                                          sample_factor,)
+                                          sample_factor, extra_group_columns, lambda_)
 
 from click import option, echo, Path
 
@@ -49,6 +49,7 @@ def _run_workflow(self):
      result_folder,
      work_folder) = run_workflow(self.work_folder, self.result_folder, self.data_folder, self.data_filename_pattern,
                                  self.job_count, self.sample_factor,
+                                 self.lambda_, self.extra_group_columns,
                                  self.extra_args_prepare,
                                  self.extra_args_subsample, self.extra_args_learn,
                                  self.extra_args_apply_weights, self.extra_args_score,
@@ -66,6 +67,7 @@ def _options():
 
     options = [data_folder, data_filename_pattern, job_count, sample_factor,
                result_folder, work_folder,
+               extra_group_columns, lambda_,
                option("--extra-args-prepare", default="",
                       help="extra args for calling prepare command"),
                option("--extra-args-subsample", default="",
