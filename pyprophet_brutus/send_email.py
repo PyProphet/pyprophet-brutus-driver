@@ -1,13 +1,28 @@
 # encoding: utf-8
 from __future__ import print_function
 
+import tempfile
 import smtplib
 import os
+import zipfile
 
 
 from email.mime.text import MIMEText
+from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
+
+
+def _zip(data, name):
+    """creates temporary zipfile with one entry named "name", "data" is the content
+    and returns the content of the zipfile as a binary string.
+    """
+    folder = tempfile.mkdtemp()
+    path = os.path.join(folder, "data.zip")
+    with zipfile.ZipFile(path, "w") as fh:
+        fh.writestr(name, data)
+    with open(path, "rb") as fh:
+        return fh.read()
 
 
 def send_result(from_, to, output, result_folder, logger):
@@ -43,6 +58,13 @@ def send_result(from_, to, output, result_folder, logger):
         txt += "no resource_summary file created !"
 
     msg.attach(MIMEText(txt))
+
+    report = MIMEBase('application', 'zip')
+    report.set_payload(_zip(output, "output.txt"))
+    encoders.encode_base64(report)
+    report.add_header('Content-Disposition', 'attachment', filename='output.zip')
+
+    msg.attach(report)
 
     # create attachment
     data = MIMEText(output)
