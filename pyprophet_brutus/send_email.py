@@ -95,8 +95,10 @@ def send_result(from_, to, output, result_folder, logger):
             s = smtplib.SMTP('localhost')
             s.sendmail(from_, to, msg.as_string())
             s.quit()
+            logger.info("email server accepted email created by %s" % builder)
             break
         except smtplib.SMTPSenderRefused, e:
+            logger.warn("email server refused email created by %s" % builder)
             if e.smtp_code == 552:   # refused because email too big.
                 continue
 
@@ -132,6 +134,6 @@ if __name__ == "__main__":
     import logging
     from_ = to = "schmittu@ethz.ch"
     output = open("o", "r").read()
-    result_folder = "/cluster/scratch_xp/public/collinsb/pyprophet_tmp/Sun_18_44_15_11_2015_ydjJrf/_workfolder"
+    result_folder = "/cluster/scratch_xp/public/collinsb/pyprophet_tmp/Sun_18_44_15_11_2015_ydjJrf"
     # "/cluster/scratch_xp/public/collinsb/pyprophet_tmp/Sun_18_44_15_11_2015_ydjJrf/"
     send_result(from_, to, output, result_folder, logger=logging)
