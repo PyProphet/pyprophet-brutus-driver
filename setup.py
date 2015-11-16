@@ -5,7 +5,7 @@ from __future__ import print_function
 from setuptools import setup, find_packages
 
 setup(name="pyprophet-brutus",
-      version="0.0.15",
+      version="0.0.16",
       author="Uwe Schmitt",
       author_email="uwe.schmitt@id.ethz.ch",
       license="BSD",
