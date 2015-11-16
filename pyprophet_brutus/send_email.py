@@ -90,6 +90,7 @@ def send_result(from_, to, output, result_folder, logger):
 if __name__ == "__main__":
     import logging
     from_ = to = "schmittu@ethz.ch"
-    output = "test output"
-    result_folder = "/cluster/scratch_xp/public/schmittu/pyprophet_tmp/Sun_20_11_13_09_2015_tjTqPo/"
+    output = open("o", "r").read()
+    result_folder = "/cluster/scratch_xp/public/collinsb/pyprophet_tmp/Sun_18_44_15_11_2015_ydjJrf/_workfolder"
+    # "/cluster/scratch_xp/public/collinsb/pyprophet_tmp/Sun_18_44_15_11_2015_ydjJrf/"
     send_result(from_, to, output, result_folder, logger=logging)
