@@ -6,7 +6,7 @@ import smtplib
 import os
 import zipfile
 
-
+from email import encoders
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
@@ -25,13 +25,26 @@ def _zip(data, name):
         return fh.read()
 
 
-def send_result(from_, to, output, result_folder, logger):
-
+def _create_msg(from_, to):
     msg = MIMEMultipart()
     msg['Subject'] = 'pyrophet workflow on brutus.ethz.ch finished'
     msg['From'] = from_
     msg['To'] = to
+    return msg
 
+
+def _read_summ_stat(result_folder):
+
+    path = os.path.join(result_folder, "summary_stats.txt")
+    if os.path.exists(path):
+        with open(path, "r") as fp:
+            txt = fp.read()
+    else:
+        txt = "no summary stat created"
+    return txt
+
+
+def _attach_txt(msg, result_folder):
     # create body
     pathes = []
     for name in os.listdir(result_folder):
@@ -40,12 +53,7 @@ def send_result(from_, to, output, result_folder, logger):
 
     pathes.sort()
 
-    path = os.path.join(result_folder, "summary_stats.txt")
-    if os.path.exists(path):
-        with open(path, "r") as fp:
-            txt = fp.read()
-    else:
-        txt = "no summary stat created"
+    txt = _read_summ_stat(result_folder)
 
     txt += "\n\npyprophet created the following result files: \n\n    %s" % "\n    ".join(pathes)
     txt += "\n\n"
@@ -59,19 +67,57 @@ def send_result(from_, to, output, result_folder, logger):
 
     msg.attach(MIMEText(txt))
 
-    report = MIMEBase('application', 'zip')
-    report.set_payload(_zip(output, "output.txt"))
-    encoders.encode_base64(report)
-    report.add_header('Content-Disposition', 'attachment', filename='output.zip')
 
-    msg.attach(report)
+def _build_full_email(from_, to, output, result_folder):
+    msg = _create_msg(from_, to)
+    _attach_txt(msg, result_folder)
+    _attach_lsf_output(msg, output)
+    _attach_pdf(msg, result_folder)
+    return msg
 
-    # create attachment
-    data = MIMEText(output)
-    data.add_header('Content-Disposition', 'attachment', filename="recorded_lsf_output.txt")
-    msg.attach(data)
 
-    # read pdf
+def _build_stripped_email(from_, to, output, result_folder):
+    msg = _create_msg(from_, to)
+    _attach_txt(msg, result_folder)
+    _attach_pdf(msg, result_folder)
+    return msg
+
+
+def send_result(from_, to, output, result_folder, logger):
+
+    # we try to send email in decreasing size until mailserver accepts:
+    builders = [_build_full_email, _build_stripped_email]
+
+    for builder in builders:
+        msg = builder(from_, to, output, result_folder)
+        try:
+            s = smtplib.SMTP('localhost')
+            s.sendmail(from_, to, msg.as_string())
+            s.quit()
+            break
+        except smtplib.SMTPSenderRefused, e:
+            if e.smtp_code == 552:   # refused because email too big.
+                continue
+
+    logger.info("connected successfully to mail server")
+    logger.info("sent email from %s to %s", from_, to)
+
+
+def _attach_lsf_output(msg, output):
+
+    # create attachment: attach zipped lsf output
+
+    zipped_output = MIMEBase('application', 'zip')
+    zipped_output.set_payload(_zip(output, "output.txt"))
+    encoders.encode_base64(zipped_output)
+    zipped_output.add_header('Content-Disposition', 'attachment', filename='recoreded_lsf_output.zip')
+    msg.attach(zipped_output)
+
+
+def _attach_pdf(msg, result_folder):
+
+    # create attachment: attach pdf report
+
     path = os.path.join(result_folder, "report.pdf")
     if os.path.exists(path):
         with open(path, "rb") as fp:
@@ -80,11 +126,6 @@ def send_result(from_, to, output, result_folder, logger):
             pdf.add_header('Content-Disposition', 'attachment', filename=('utf-8', '', "report.pdf"))
             msg.attach(pdf)
 
-    s = smtplib.SMTP('localhost')
-    logger.info("connected successfully to mail server")
-    s.sendmail(from_, to, msg.as_string())
-    logger.info("sent email from %s to %s", from_, to)
-    s.quit()
 
 if __name__ == "__main__":
     import logging
