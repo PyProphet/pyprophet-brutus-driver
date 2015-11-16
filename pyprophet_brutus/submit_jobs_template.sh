@@ -7,6 +7,7 @@ WORK_FOLDER={work_folder}
 RESULT_FOLDER={result_folder}
 
 JC={job_count}
+JSL={job_slot_limit}
 
 GROUP=$RESULT_FOLDER
 
@@ -20,7 +21,7 @@ bsub -o $MSG_FOLDER/prepare_out -cwd $GROUP -J "prepare" $R -g $GROUP <<EOL
                           {extra_args_prepare}
 EOL
 
-bsub -o $MSG_FOLDER/subsample_out -J "subsample[1-$JC]" -w "done(prepare)" $R -g $GROUP <<EOL
+bsub -o $MSG_FOLDER/subsample_out -J "subsample[1-$JC]%$JSL" -w "done(prepare)" $R -g $GROUP <<EOL
      pyprophet-cli subsample --data-folder $DATA_FOLDER \
                              --data-filename-pattern "{data_filename_pattern}" \
                              --work-folder $WORK_FOLDER \
@@ -38,7 +39,7 @@ bsub -o $MSG_FOLDER/learn_out -J "learn" -w "done(subsample)" -g $GROUP $R <<EOL
                              {extra_args_learn}
 EOL
 
-bsub -o $MSG_FOLDER/apply_weights_out -J "apply_weights[1-$JC]" -w "done(learn)" $R -g $GROUP <<EOL
+bsub -o $MSG_FOLDER/apply_weights_out -J "apply_weights[1-$JC]%$JSL" -w "done(learn)" $R -g $GROUP <<EOL
      pyprophet-cli apply_weights --data-folder $DATA_FOLDER \
                                  --data-filename-pattern "{data_filename_pattern}" \
                                  --work-folder $WORK_FOLDER \
@@ -49,7 +50,7 @@ bsub -o $MSG_FOLDER/apply_weights_out -J "apply_weights[1-$JC]" -w "done(learn)"
                                  {extra_args_apply_weights}
 EOL
 
-bsub -o $MSG_FOLDER/scorer_out -J "score[1-$JC]" -w "done(apply_weights)" $R -g $GROUP <<EOL
+bsub -o $MSG_FOLDER/scorer_out -J "score[1-$JC]%$JSL" -w "done(apply_weights)" $R -g $GROUP <<EOL
      pyprophet-cli score --data-folder $DATA_FOLDER \
                          --data-filename-pattern "{data_filename_pattern}" \
                          --work-folder $WORK_FOLDER \
