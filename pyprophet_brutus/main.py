@@ -33,6 +33,7 @@ job_slot_limit = option("--job-slot-limit",
                         default=32
                         )
 
+
 extra_args_prepare = option("--extra-args-prepare", default="",
                             help="extra args for calling prepare command")
 extra_args_subsample = option("--extra-args-subsample", default="",
@@ -45,16 +46,20 @@ extra_args_apply_weights = option("--extra-args-apply-weights", default="",
 extra_args_score = option("--extra-args-score", default="",
                           help="extra args for calling score command")
 
-notification_email_address = option("--notification-email-address", default=_user_email(),
+user_email = "{}@ethz.ch".format(os.environ.get("USER"))
+
+notification_email_address = option("--notification-email-address", default=user_email,
                                     help=("send result notification to this address, use 'null' to disable this "
-                                          "[default={}]".format(_user_email())))
+                                          "[default={}]".format(user_email)))
+
+def print_version(ctx, param, value):
+    if not value or ctx.resilient_parsing:
+        return
+    echo("%d.%d.%d" % version)
+    ctx.exit()
 
 print_version = option("--version", is_flag=True, callback=print_version, expose_value=False,
                        is_eager=True, help="print version of brutus plugin")
-
-
-def _user_email():
-    return "{}@ethz.ch".format(os.environ.get("USER"))
 
 
 def _run_workflow(self):
@@ -63,7 +68,7 @@ def _run_workflow(self):
 
     def send_notification(output, result_folder):
         from send_email import send_result
-        send_result(from_=_user_email(), to=self.notification_email_address, output=output,
+        send_result(from_=user_email, to=self.notification_email_address, output=output,
                     result_folder=result_folder, logger=self.logger)
 
     if self.notification_email_address != "none":
@@ -80,13 +85,6 @@ def _run_workflow(self):
                                  self.extra_args_subsample, self.extra_args_learn,
                                  self.extra_args_apply_weights, self.extra_args_score,
                                  callback=callback, logger=self.logger)
-
-
-def print_version(ctx, param, value):
-    if not value or ctx.resilient_parsing:
-        return
-    echo("%d.%d.%d" % version)
-    ctx.exit()
 
 
 def _options():
