@@ -96,7 +96,7 @@ def _options():
                result_folder, work_folder,
                extra_group_columns, lambda_,
                notification_email_address,
-               print_version
+               print_version,
                extra_args_prepare,
                extra_args_subsample,
                extra_args_learn,
