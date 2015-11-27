@@ -54,6 +54,7 @@ bsub -o $MSG_FOLDER/scorer_out -J "score[1-$JC]%$JSL" -w "done(apply_weights)" $
      pyprophet-cli score --data-folder $DATA_FOLDER \
                          --data-filename-pattern "{data_filename_pattern}" \
                          --work-folder $WORK_FOLDER \
+                         --statistics-mode {statistics_mode} \
                          --job-number \$LSB_JOBINDEX \
                          --job-count \$LSB_JOBINDEX_END \
                          --local-folder \$TMPDIR \

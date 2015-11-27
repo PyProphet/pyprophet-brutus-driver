@@ -11,9 +11,9 @@ import time
 
 
 def run_workflow(work_folder, result_folder, data_folder, data_filename_pattern, job_count,
-                 sample_factor, job_slot_limit, lambda_, extra_group_columns, extra_args_prepare="",
-                 extra_args_subsample="", extra_args_learn="", extra_args_apply_weights="",
-                 extra_args_score="", callback=None, logger=None):
+                 sample_factor, job_slot_limit, statistics_mode, lambda_, extra_group_columns,
+                 extra_args_prepare="", extra_args_subsample="", extra_args_learn="",
+                 extra_args_apply_weights="", extra_args_score="", callback=None, logger=None):
 
     if result_folder is None:
         user = os.environ.get("USER")

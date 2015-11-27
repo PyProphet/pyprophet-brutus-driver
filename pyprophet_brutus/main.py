@@ -9,7 +9,8 @@ version = tuple(map(int, pkg_resources.require("pyprophet-brutus")[0].version.sp
 
 
 from pyprophet_cli.common_options import (data_folder, data_filename_pattern, job_count,
-                                          sample_factor, extra_group_columns, lambda_)
+                                          sample_factor, extra_group_columns, lambda_,
+                                          statistics_mode)
 
 from click import option, echo, Path
 
@@ -62,35 +63,10 @@ print_version = option("--version", is_flag=True, callback=print_version, expose
                        is_eager=True, help="print version of brutus plugin")
 
 
-def _run_workflow(self):
-
-    from run_on_lsf import run_workflow
-
-    def send_notification(output, result_folder):
-        from send_email import send_result
-        send_result(from_=user_email, to=self.notification_email_address, output=output,
-                    result_folder=result_folder, logger=self.logger)
-
-    if self.notification_email_address != "none":
-        callback = send_notification
-    else:
-        callback = None
-
-    (output,
-     result_folder,
-     work_folder) = run_workflow(self.work_folder, self.result_folder, self.data_folder, self.data_filename_pattern,
-                                 self.job_count, self.sample_factor, self.job_slot_limit,
-                                 self.lambda_, self.extra_group_columns,
-                                 self.extra_args_prepare,
-                                 self.extra_args_subsample, self.extra_args_learn,
-                                 self.extra_args_apply_weights, self.extra_args_score,
-                                 callback=callback, logger=self.logger)
-
-
 def _options():
 
     options = [data_folder, data_filename_pattern, job_count, sample_factor,
-               job_slot_limit,
+               job_slot_limit, statistics_mode,
                result_folder, work_folder,
                extra_group_columns, lambda_,
                notification_email_address,
@@ -102,6 +78,32 @@ def _options():
                extra_args_score,
                ]
     return options
+
+
+def _run_workflow(job):
+
+    from run_on_lsf import run_workflow
+
+    def send_notification(output, result_folder):
+        from send_email import send_result
+        send_result(from_=user_email, to=job.notification_email_address, output=output,
+                    result_folder=result_folder, logger=job.logger)
+
+    if job.notification_email_address != "none":
+        callback = send_notification
+    else:
+        callback = None
+
+    (output,
+     result_folder,
+     work_folder) = run_workflow(job.work_folder, job.result_folder, job.data_folder, job.data_filename_pattern,
+                                 job.job_count, job.sample_factor, job.job_slot_limit,
+                                 job.statistics_mode,
+                                 job.lambda_, job.extra_group_columns,
+                                 job.extra_args_prepare,
+                                 job.extra_args_subsample, job.extra_args_learn,
+                                 job.extra_args_apply_weights, job.extra_args_score,
+                                 callback=callback, logger=job.logger)
 
 
 def config():

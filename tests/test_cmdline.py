@@ -34,6 +34,7 @@ def test_0():
             --data-filename-pattern 'test_data_0.tsv' \
             --job-count 1 \
             --sample-factor 0.2 \
+            --statistics-mode local \
             --extra-group-column transition_group_id\
             --extra-group-column transition_group_id\
             --extra-group-column transition_group_id\
