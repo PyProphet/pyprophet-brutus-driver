@@ -1,11 +1,11 @@
 # encoding: utf-8
 from __future__ import print_function
 
-import tempfile
-import smtplib
+import glob
 import os
+import smtplib
+import tempfile
 import zipfile
-
 
 from email import encoders
 from email.mime.text import MIMEText
@@ -45,7 +45,7 @@ def _read_summ_stat(result_folder):
     return txt
 
 
-def _attach_txt(msg, result_folder):
+def _create_email_text(msg, result_folder):
     # create body
     pathes = []
     for name in os.listdir(result_folder):
@@ -71,16 +71,16 @@ def _attach_txt(msg, result_folder):
 
 def _build_full_email(from_, to, output, result_folder):
     msg = _create_msg(from_, to)
-    _attach_txt(msg, result_folder)
+    _create_email_text(msg, result_folder)
     _attach_lsf_output(msg, output)
-    _attach_pdf(msg, result_folder)
+    _attach_report_pdfs(msg, result_folder)
     return msg
 
 
 def _build_stripped_email(from_, to, output, result_folder):
     msg = _create_msg(from_, to)
-    _attach_txt(msg, result_folder)
-    _attach_pdf(msg, result_folder)
+    _create_email_text(msg, result_folder)
+    _attach_report_pdfs(msg, result_folder)
     return msg
 
 
@@ -117,17 +117,30 @@ def _attach_lsf_output(msg, output):
     msg.attach(zipped_output)
 
 
-def _attach_pdf(msg, result_folder):
+def _attach_report_pdfs(msg, result_folder):
 
-    # create attachment: attach pdf report
+    report_paths = glob.glob(os.path.join(result_folder, "report*.pdf"))
 
-    path = os.path.join(result_folder, "report.pdf")
-    if os.path.exists(path):
-        with open(path, "rb") as fp:
-            data = fp.read()
-            pdf = MIMEApplication(data, _subtype="pdf")
-            pdf.add_header('Content-Disposition', 'attachment', filename=('utf-8', '', "report.pdf"))
-            msg.attach(pdf)
+    if not report_paths:
+        return
+
+    temp_zipfile_path = os.path.join(tempfile.mkdtemp(), "reports.zip")
+    with zipfile.ZipFile(temp_zipfile_path, "w") as fh:
+        for report_path in report_paths:
+            name = os.path.basename(report_path)
+            fh.writestr(name, open(report_path).read())
+    payload = open(temp_zipfile_path, "rb").read()
+    zipped_reports = MIMEBase('application', 'zip')
+    zipped_reports.set_payload(payload)
+    encoders.encode_base64(zipped_reports)
+    zipped_reports.add_header('Content-Disposition', 'attachment', filename='reports.zip')
+    msg.attach(zipped_reports)
+
+    with open(report_paths[0], "rb") as fp:
+        data = fp.read()
+        pdf = MIMEApplication(data, _subtype="pdf")
+        pdf.add_header('Content-Disposition', 'attachment', filename=('utf-8', '', "first report.pdf"))
+        msg.attach(pdf)
 
 
 if __name__ == "__main__":
